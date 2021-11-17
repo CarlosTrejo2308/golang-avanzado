@@ -19,6 +19,7 @@ type Service struct {
 }
 
 func (s *Service) Work(job int) {
+	// Lock the service
 	s.Lock.RLock()
 
 	// If exist, then wait for the respons of the existing worker
@@ -66,10 +67,10 @@ func (s *Service) Work(job int) {
 
 	// We are done with this job, reset the state
 	s.Lock.Lock()
-	//delete(s.InProgress, job)
-	//delete(s.IsPending, job)
-	s.InProgress[job] = false
-	s.IsPending[job] = make([]chan int, 0)
+	delete(s.InProgress, job)
+	delete(s.IsPending, job)
+	//s.InProgress[job] = false
+	//s.IsPending[job] = make([]chan int, 0)
 	s.Lock.Unlock()
 
 	fmt.Printf("Finished job %d, got %d\n", job, res)
@@ -97,4 +98,5 @@ func main() {
 		}(job)
 	}
 	wg.Wait()
+
 }
